@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar";
 import { connectWallet, getConnectedPublicKey, signTransactionWithWallet } from "@/lib/wallet";
 import { fetchAuthChallenge, verifyAuthChallenge, setJwtToken } from "@/lib/api";
 import "@/styles/globals.css";
-import { ToastProvider } from "@/components/Toast";
+import { ToastProvider, useToast } from "@/components/Toast";
 import { PriceProvider } from "@/contexts/PriceContext";
 import KeyboardShortcutsModal from "@/components/KeyboardShortcutsModal";
 import CommandPalette from "@/components/CommandPalette";
@@ -15,11 +15,12 @@ import RateLimitWatcher from "@/components/RateLimitWatcher";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import "../lib/i18n";
 
-function App({ Component, pageProps }: AppProps) {
+function AppContent({ Component, pageProps }: AppProps) {
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [shortcutsModalOpen, setShortcutsModalOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const router = useRouter();
+  const toast = useToast();
 
   const isJobDetailPage = router.pathname === "/jobs/[id]";
 
@@ -34,6 +35,7 @@ function App({ Component, pageProps }: AppProps) {
     onToggleShortcutsModal: handleToggleShortcutsModal,
     onFocusSearch: () => window.dispatchEvent(new CustomEvent("shortcut-focus-search")),
     onToggleBookmark: () => window.dispatchEvent(new CustomEvent("shortcut-toggle-bookmark")),
+    onToggleTheme: () => window.dispatchEvent(new CustomEvent("shortcut-toggle-theme")),
     onOpenCommandPalette: () => setCommandPaletteOpen(true),
     shortcutsModalOpen,
   });
@@ -88,8 +90,7 @@ function App({ Component, pageProps }: AppProps) {
 
   return (
     <>
-      <ToastProvider>
-        <PriceProvider>
+      <PriceProvider>
         <Head>
           <title>Stellar MarketPay — Decentralised Freelance Marketplace</title>
           <meta name="description" content="Post jobs, hire freelancers, and pay with XLM — secured by Soroban smart contracts." />
@@ -116,9 +117,16 @@ function App({ Component, pageProps }: AppProps) {
           />
         </div>
         <RateLimitWatcher />
-        </PriceProvider>
-      </ToastProvider>
+      </PriceProvider>
     </>
+  );
+}
+
+function App(props: AppProps) {
+  return (
+    <ToastProvider>
+      <AppContent {...props} />
+    </ToastProvider>
   );
 }
 

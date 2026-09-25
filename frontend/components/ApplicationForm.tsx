@@ -167,6 +167,7 @@ export default function ApplicationForm({ job, publicKey, biddingPhase = "commit
     } catch {
       onRevert?.();
       setSubmitted(false);
+      setError("Failed to submit application. Please try again.");
       toast.error("Failed to submit application. Please try again.");
       setLoading(false);
     }
