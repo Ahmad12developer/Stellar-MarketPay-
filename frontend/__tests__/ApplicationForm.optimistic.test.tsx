@@ -179,7 +179,7 @@ describe("ApplicationForm optimistic updates", () => {
     fireEvent.click(button);
     fireEvent.click(button);
 
-    expect(api.submitApplication).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(api.submitApplication).toHaveBeenCalledTimes(1));
 
     resolveSubmit({ success: true });
     await act(async () => {
