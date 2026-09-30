@@ -9,6 +9,30 @@ const pool = require("../db/pool");
 const { validatePortfolioFiles } = require("./ipfsService");
 const { mergeVerificationMetadata } = require("./linkVerificationService");
 const encryptionService = require("./encryptionService");
+const { JSDOM } = require("jsdom");
+const createDOMPurify = require("dompurify");
+
+const window = new JSDOM("").window;
+const purify = createDOMPurify(window);
+
+/**
+ * Sanitizes a bio string with DOMPurify (server-side, using jsdom) before storing.
+ * Strips all HTML tags — stores plain text only.
+ *
+ * @param {string|null|undefined} bio
+ * @returns {string|null}
+ */
+function sanitizeBio(bio) {
+  if (bio == null) return null;
+  if (typeof bio !== "string") return null;
+  // First sanitize any malicious HTML, then strip tags and return plain text
+  const cleaned = purify.sanitize(bio, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+  // Remove any remaining HTML entities and tags to ensure plain-text storage
+  const withoutTags = cleaned.replace(/<[^>]*>/g, "");
+  // Decode common HTML entities produced by sanitizers
+  const decoded = withoutTags.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+  return decoded.trim();
+}
 
 const VALID_PROFILE_ROLES = ["client", "freelancer", "both"];
 const VALID_PORTFOLIO_TYPES = ["github", "live", "stellar_tx", "file"];
@@ -364,10 +388,7 @@ async function getProfile(publicKey) {
 async function upsertProfile({ publicKey, displayName, bio, skills, portfolioItems, portfolioFiles, availability, role, email, emailNotificationsEnabled, webhookUrl, webhookSecret, phone, kycData, encryptionPublicKey }) {
   validatePublicKey(publicKey);
 
-  // Run synchronous validation first so callers sending malformed
-  // payloads never trigger any DB round-trips (preserves pre-existing
-  // `expect(pool.query).not.toHaveBeenCalled()` semantics for the
-  // rejects-* tests).
+  const safeBio = bio != null ? (sanitizeBio(bio) || null) : null;
   const safeSkills = Array.isArray(skills) ? skills.slice(0, 15) : null;
   const validatedPortfolio = validatePortfolioItems(portfolioItems);
   const safePortfolioFiles = validatePortfolioFiles(portfolioFiles);
@@ -428,7 +449,7 @@ async function upsertProfile({ publicKey, displayName, bio, skills, portfolioIte
     [
       publicKey,
       displayName?.trim() || null,
-      bio?.trim() || null,
+      safeBio,
       safeSkills,
       JSON.stringify(safePortfolioItems),
       JSON.stringify(safePortfolioFiles),
@@ -1086,5 +1107,6 @@ module.exports = {
   VALID_AVAILABILITY_STATUSES,
   MAX_PORTFOLIO_ITEMS,
   markProfileForDeletion,
-  permanentlyDeleteExpiredProfiles
+  permanentlyDeleteExpiredProfiles,
+  sanitizeBio,
 };
