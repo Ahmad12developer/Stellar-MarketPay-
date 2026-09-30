@@ -10,6 +10,7 @@
 
 const express = require("express");
 const { createRateLimiter } = require("../middleware/rateLimiter");
+const { recordEscrowRelease } = require("../metrics");
 
 const escrowActionRateLimiter = createRateLimiter(30, 1);
 
@@ -125,6 +126,8 @@ router.post("/:jobId/release", async (req, res, next) => {
       // Non-fatal
     }
 
+    recordEscrowRelease(true);
+
     res.json({
       success: true,
       message: "Escrow released and job completed",
@@ -143,6 +146,7 @@ router.post("/:jobId/release", async (req, res, next) => {
       }),
     });
   } catch (e) {
+    recordEscrowRelease(false, e);
     next(e);
   }
 });
