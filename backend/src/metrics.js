@@ -148,6 +148,32 @@ const xlmPriceUsd = createMetric(promClient.Gauge, {
   help: "Current XLM price in USD (updated on every successful CoinGecko fetch)",
 });
 
+const escrowReleasesTotal = createMetric(promClient.Counter, {
+  name: "marketpay_escrow_releases_total",
+  help: "Total escrow release attempts",
+  labelNames: ["result"],
+});
+const escrowReleaseErrorsTotal = createMetric(promClient.Counter, {
+  name: "marketpay_escrow_release_errors_total",
+  help: "Total failed escrow release attempts by bounded reason",
+  labelNames: ["reason"],
+});
+
+// ─── Cache metrics (Issue #1512) ─────────────────────────────────────────────
+/** Cache hit counter for Redis-backed caches, labeled by cache name. */
+const cacheHitsTotal = createMetric(promClient.Counter, {
+  name: "marketpay_cache_hits_total",
+  help: "Total cache hits, labeled by cache name",
+  labelNames: ["cache"],
+});
+
+/** Cache miss counter for Redis-backed caches, labeled by cache name. */
+const cacheMissesTotal = createMetric(promClient.Counter, {
+  name: "marketpay_cache_misses_total",
+  help: "Total cache misses, labeled by cache name",
+  labelNames: ["cache"],
+});
+
 // ─── IPFS pin verification ────────────────────────────────────────────────────
 /**
  * Counts uploads whose IPFS pin could not be confirmed after the configured
@@ -168,7 +194,6 @@ const ipfsPinVerificationFailuresTotal = createMetric(promClient.Counter, {
 const xlmPriceFetchErrorsTotal = createMetric(promClient.Counter, {
   name: "xlm_price_fetch_errors_total",
   help: "Total XLM/USD price fetch failures across all providers",
-});
 });
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -333,6 +358,24 @@ function recordEscrowRelease(ok, err) {
 }
 
 /**
+ * Record a cache hit for the named cache.
+ *
+ * @param {string} cache cache name, e.g. "insights"
+ */
+function recordCacheHit(cache) {
+  cacheHitsTotal.inc({ cache });
+}
+
+/**
+ * Record a cache miss for the named cache.
+ *
+ * @param {string} cache cache name, e.g. "insights"
+ */
+function recordCacheMiss(cache) {
+  cacheMissesTotal.inc({ cache });
+}
+
+/**
  * Render the registry in Prometheus text exposition format.
  *
  * @returns {Promise<string>} metrics payload
@@ -363,6 +406,9 @@ module.exports = {
   xlmPriceUsd,
   ipfsPinVerificationFailuresTotal,
   xlmPriceFetchErrorsTotal,
+  // cache metrics
+  cacheHitsTotal,
+  cacheMissesTotal,
   // legacy aliases
   legacyHttpRequestsTotal,
   legacyHttpRequestDurationSeconds,
@@ -376,5 +422,7 @@ module.exports = {
   setWebsocketConnections,
   recordEscrowRelease,
   escrowReleaseReason,
+  recordCacheHit,
+  recordCacheMiss,
   renderMetrics,
 };
