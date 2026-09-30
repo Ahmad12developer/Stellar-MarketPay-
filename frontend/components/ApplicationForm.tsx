@@ -225,6 +225,57 @@ export default function ApplicationForm({ job, publicKey, biddingPhase = "commit
             </select>
           </div>
 
+          {/* Co-write proposal — invite a teammate (#1552) */}
+          <div className="rounded-xl border border-market-500/20 bg-market-900/30 p-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-medium text-amber-100">Co-write this proposal</p>
+                <p className="text-xs text-amber-700 mt-0.5">
+                  Invite a teammate to edit and review together in real time. The
+                  session locks automatically when you submit.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleInviteCollaborator}
+                disabled={creatingScope}
+                className="btn-secondary px-3 py-2 text-sm whitespace-nowrap"
+                data-testid="invite-collaborator"
+              >
+                {creatingScope
+                  ? "Creating..."
+                  : scopeShareUrl
+                    ? "Copy invite link"
+                    : "Invite collaborator"}
+              </button>
+            </div>
+            {scopeShareUrl && (
+              <div className="mt-3 flex gap-2">
+                <input
+                  className="input-field flex-1 text-xs"
+                  value={scopeShareUrl}
+                  readOnly
+                  aria-label="Co-writing invite link"
+                />
+                <button
+                  type="button"
+                  className="btn-secondary px-3 py-2 text-xs"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard?.writeText(scopeShareUrl);
+                      setScopeCopied(true);
+                    } catch {
+                      /* noop */
+                    }
+                  }}
+                >
+                  {scopeCopied ? "Copied" : "Copy"}
+                </button>
+              </div>
+            )}
+            {scopeError && <p className="mt-2 text-xs text-red-400">{scopeError}</p>}
+          </div>
+
           {/* Cover letter */}
           <div>
             <label className="label" htmlFor="cover-letter">Cover Letter</label>
