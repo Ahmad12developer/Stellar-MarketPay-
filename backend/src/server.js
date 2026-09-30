@@ -41,6 +41,7 @@ const turretRoutes       = require("./routes/turrets");
 const referralRoutes     = require("./routes/referrals");
 const reputationRoutes   = require("./routes/reputation");
 const autoConvertRoutes  = require("./routes/autoConvert");
+const anchorRoutes        = require("./routes/anchors");
 const scopeRoutes        = require("./routes/scope");
 const analyticsRoutes    = require("./routes/analytics");
 const searchRoutes       = require("./routes/search");
@@ -192,6 +193,7 @@ app.use("/api/contributors",  contributorRoutes);
 app.use("/api/verification",  verificationRoutes);
 app.use("/api/nft",           nftRoutes);
 app.use("/api/ai-scorer",     aiScorerRoutes);
+app.use("/api/anchors",       anchorRoutes);
 
 app.get("/api/indexer/health", (req, res) => {
   res.json({
