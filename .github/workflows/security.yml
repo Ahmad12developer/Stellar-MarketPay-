@@ -114,6 +114,7 @@ jobs:
           severity: HIGH,CRITICAL
           trivyignores: .trivyignore
           exit-code: "1"
+          skip-version-check: true
           format: sarif
           output: trivy-results.sarif
 
