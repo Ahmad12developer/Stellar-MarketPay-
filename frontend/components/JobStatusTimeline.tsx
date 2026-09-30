@@ -2,7 +2,7 @@
  * components/JobStatusTimeline.tsx
  * Visual stepper showing job lifecycle progression with on-chain event anchoring (Issue #876).
  */
-import { useState } from "react";
+import { useId, useState } from "react";
 import { formatDate } from "@/utils/format";
 import { explorerUrl } from "@/lib/stellar";
 import { rejectMilestone } from "@/lib/api";
@@ -31,6 +31,7 @@ type StepState = "complete" | "current" | "upcoming" | "branch";
 interface TimelineStep {
   id: string;
   label: string;
+  explanation: string;
   date?: string;
   state: StepState;
   txHash?: string | null;
@@ -62,18 +63,21 @@ function buildSteps(job: Job, timeline?: TimelineEvent[]): { steps: TimelineStep
     {
       id: "posted",
       label: "Posted",
+      explanation: "The client has published this job. Next: freelancers can apply.",
       date: job.createdAt,
       state: "complete",
     },
     {
       id: "hired",
       label: "Hired",
+      explanation: "The client selected a freelancer. Next: the freelancer can begin the work.",
       date: hiredDate,
       state: "upcoming",
     },
     {
       id: "in_progress",
       label: "Escrow Funded",
+      explanation: "The client’s payment is locked in escrow while work is underway. Next: the freelancer submits work, then the client reviews it.",
       date:
         job.status === "in_progress" || job.status === "disputed"
           ? job.updatedAt
@@ -84,6 +88,7 @@ function buildSteps(job: Job, timeline?: TimelineEvent[]): { steps: TimelineStep
     {
       id: "done",
       label: "Released",
+      explanation: "The client approved the work and escrow released payment to the freelancer. No further action is required.",
       date: doneDate,
       state: "upcoming",
       txHash: escrowReleasedTxHash,
@@ -107,6 +112,7 @@ function buildSteps(job: Job, timeline?: TimelineEvent[]): { steps: TimelineStep
       branch: {
         id: "cancelled",
         label: "Cancelled",
+        explanation: "The job was cancelled. Neither the client nor the freelancer needs to act on this job.",
         date: branchDate,
         state: "branch",
       },
@@ -120,6 +126,7 @@ function buildSteps(job: Job, timeline?: TimelineEvent[]): { steps: TimelineStep
       branch: {
         id: "disputed",
         label: "Disputed",
+        explanation: "A dispute is open about the work or payment. Next: the assigned arbitrator reviews the case.",
         date: branchDate,
         state: "branch",
       },
@@ -153,6 +160,34 @@ function StepCircle({ state }: { state: StepState }) {
         ""
       )}
     </div>
+  );
+}
+
+/** An always-keyboard-accessible explanation for a timeline status. */
+function StepExplanation({ step }: { step: TimelineStep }) {
+  const tooltipId = `timeline-help-${useId()}`;
+
+  return (
+    <span className="relative inline-flex items-center group align-middle">
+      <button
+        type="button"
+        aria-label={`More about ${step.label}`}
+        aria-describedby={tooltipId}
+        className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full border border-current/40 text-[10px] font-semibold leading-none opacity-80 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-market-400"
+      >
+        <svg aria-hidden="true" viewBox="0 0 16 16" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="1.5">
+          <circle cx="8" cy="8" r="6.25" />
+          <path strokeLinecap="round" d="M8 7v4m0-6h.01" />
+        </svg>
+      </button>
+      <span
+        id={tooltipId}
+        role="tooltip"
+        className="pointer-events-none invisible absolute bottom-full left-1/2 z-20 mb-2 w-56 -translate-x-1/2 rounded-md border border-market-500/30 bg-ink-900 px-3 py-2 text-left text-[11px] font-normal leading-relaxed text-market-100 opacity-0 shadow-lg transition-opacity group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
+      >
+        {step.explanation}
+      </span>
+    </span>
   );
 }
 
@@ -357,7 +392,11 @@ export default function JobStatusTimeline({
             </div>
           ))}
         </div>
-        <p className="text-[10px] text-amber-800/70 mt-1.5">{currentStep?.label}</p>
+        {currentStep && (
+          <p className="text-[10px] text-amber-800/70 mt-1.5">
+            {currentStep.label}<StepExplanation step={currentStep} />
+          </p>
+        )}
       </div>
     );
   }
@@ -379,7 +418,7 @@ export default function JobStatusTimeline({
                     : "text-amber-700",
                 ].join(" ")}
               >
-                {step.label}
+                {step.label}<StepExplanation step={step} />
               </span>
               {step.date && (
                 <span className="text-[10px] text-amber-800/60 whitespace-nowrap">
@@ -402,7 +441,9 @@ export default function JobStatusTimeline({
           <div className="flex items-start ml-2 pl-2 border-l border-dashed border-red-400/40">
             <div className="flex flex-col items-center gap-1.5 min-w-[4.5rem]">
               <StepCircle state="branch" />
-              <span className="text-xs font-medium text-red-400 text-center">{branch.label}</span>
+              <span className="text-xs font-medium text-red-400 text-center">
+                {branch.label}<StepExplanation step={branch} />
+              </span>
               {branch.date && (
                 <span className="text-[10px] text-amber-800/60 whitespace-nowrap">
                   {formatDate(branch.date)}
@@ -428,7 +469,7 @@ export default function JobStatusTimeline({
                       : "text-amber-700",
                   ].join(" ")}
                 >
-                  {step.label}
+                  {step.label}<StepExplanation step={step} />
                 </p>
                 {step.date && (
                   <p className="text-xs text-amber-800/60">{formatDate(step.date)}</p>
@@ -450,7 +491,9 @@ export default function JobStatusTimeline({
           <div className="flex items-start gap-3 mt-2 pt-2 border-t border-dashed border-red-400/30">
             <StepCircle state="branch" />
             <div className="pt-0.5">
-              <p className="text-sm font-medium text-red-400">{branch.label}</p>
+              <p className="text-sm font-medium text-red-400">
+                {branch.label}<StepExplanation step={branch} />
+              </p>
               {branch.date && (
                 <p className="text-xs text-amber-800/60">{formatDate(branch.date)}</p>
               )}
