@@ -100,6 +100,8 @@ describe("ApplicationForm — co-write proposal (#1552)", () => {
     fireEvent.click(screen.getByTestId("invite-collaborator"));
     await screen.findByLabelText("Co-writing invite link");
 
+    // The form submits optimistically on a single click (see the optimistic
+    // suite); there is no separate confirmation step to click through.
     fireEvent.click(screen.getByRole("button", { name: /submit proposal/i }));
 
     await waitFor(() => expect(mockApi.submitApplication).toHaveBeenCalledTimes(1));

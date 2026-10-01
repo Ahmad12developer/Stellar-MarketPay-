@@ -39,6 +39,9 @@ function scaleMaxRequests(maxRequests) {
   return Math.max(1, Math.floor(maxRequests * getRateLimitScale()));
 }
 
+/**
+ * Factory function to create reusable rate limiters
+ */
 const createRateLimiter = (maxRequests, windowMinutes, options = {}) => {
   return rateLimit({
     windowMs: windowMinutes * 60 * 1000,
@@ -50,6 +53,7 @@ const createRateLimiter = (maxRequests, windowMinutes, options = {}) => {
       const retryAfter = Math.ceil(windowMinutes * 60);
       res.set("Retry-After", String(retryAfter));
       rateLimitLogger.warn({
+        endpoint: req.path,
         endpoint: options.name || req.originalUrl,
         ip: getClientIp(req),
         method: req.method,

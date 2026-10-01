@@ -57,7 +57,7 @@ fn release_milestone_at(env: &Env, escrow: &mut Escrow, position: u32) -> i128 {
         panic!("Milestone already rejected");
     }
     for previous_milestone in escrow.milestones.iter() {
-        if previous_milestone.id < milestone_id && !previous_milestone.released {
+        if previous_milestone.id < milestone.id && !previous_milestone.released {
             panic!(
                 "{}",
                 ContractError::PreviousMilestoneNotApproved.panic_message()

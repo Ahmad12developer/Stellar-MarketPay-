@@ -17,6 +17,8 @@ jest.mock("../lib/wallet", () => ({
 
 jest.mock("../lib/anchors", () => ({
   ANCHOR_HOME_DOMAIN: "anchor.example.com",
+  fetchApprovedAnchors: jest.fn(),
+  fetchAnchorEndpoints: jest.fn(),
   fetchAnchorEndpoints: jest.fn(),\n  fetchApprovedAnchors: jest.fn(),
   startInteractiveDeposit: jest.fn(),
   pollAnchorTransaction: jest.fn(),
@@ -34,6 +36,7 @@ const MOCK_PK = "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWHF";
 const noop = jest.fn();
 
 function mockAnchorEndpoints() {
+  (anchorsLib.fetchApprovedAnchors as jest.Mock).mockResolvedValue([]);
   (anchorsLib.fetchAnchorEndpoints as jest.Mock).mockResolvedValue({
     currencies: [{ code: "XLM" }],
     TRANSFER_SERVER: "https://anchor.example.com/transfer",
