@@ -25,7 +25,6 @@ const applicationRoutes = require("./routes/applications");
 const profileRoutes     = require("./routes/profiles");
 const escrowRoutes      = require("./routes/escrow");
 const healthRoutes      = require("./routes/health");
-const pingRoutes        = require("./routes/ping");
 const authRoutes        = require("./routes/auth");
 const ratingRoutes      = require("./routes/ratings");
 const progressRoutes    = require("./routes/progress");
@@ -188,7 +187,6 @@ app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 150, standardHeaders: true, l
  
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use("/health",            healthRoutes);
-app.use("/ping",              pingRoutes);
 app.use("/api/auth",          authRoutes);
 app.use("/api/jobs",          jobRoutes);
 app.use("/api/applications",  applicationRoutes);
@@ -395,21 +393,11 @@ wsServer.on("connection", async (ws, request) => {
         const message = JSON.parse(String(raw));
         if (!message || typeof message !== "object") return;
         if (message.type === "scope:update") {
-          if (
-            typeof message.content === "string" &&
-            message.content.length > MAX_CONTENT_LENGTH
-          ) {
-            sendJson(ws, "scope:error", {
-              error: `Payload Too Large: content length ${message.content.length} exceeds maximum limit of ${MAX_CONTENT_LENGTH} characters`,
-            });
-            return;
-          }
           const nextCursors = { ...(session.cursors || {}), ...(message.cursors || {}) };
           session = await upsertScopeSession(sessionId, {
             content: typeof message.content === "string" ? message.content : session.content,
             cursors: nextCursors,
             finalized: false,
-            finalizedHash: session.finalized_hash || null,
             finalizedPayload: session.finalized_payload || null,
           });
           for (const client of clients) {
@@ -417,7 +405,6 @@ wsServer.on("connection", async (ws, request) => {
               sessionId,
               content: session.content,
               cursors: session.cursors || {},
-              finalizedHash: session.finalized_hash || null,
               updatedAt: session.updated_at,
             });
           }
@@ -442,17 +429,15 @@ wsServer.on("connection", async (ws, request) => {
             .digest("hex");
  
           session = await upsertScopeSession(sessionId, {
-            content: finalContent,
+            content: typeof message.content === "string" ? message.content : session.content,
             cursors: session.cursors || {},
             finalized: true,
-            finalizedHash: contentHash,
             finalizedPayload: message.payload || null,
           });
           for (const client of clients) {
             sendJson(client, "scope:finalized", {
               sessionId,
               content: session.content,
-              finalizedHash: contentHash,
               payload: session.finalized_payload || null,
               updatedAt: session.updated_at,
             });
