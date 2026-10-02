@@ -47,11 +47,18 @@ function App({ Component, pageProps }: AppProps) {
   const { i18n } = useTranslation("common");
   const initialLocale = getInitialLocale();
 
-  // Resolve the persisted/browser locale during render so the first client
-  // render uses the same locale preference instead of briefly showing English.
-  if (i18n.language !== initialLocale) {
-    void i18n.changeLanguage(initialLocale);
-  }
+  // Sync the persisted/browser locale once the i18next instance is available.
+  // next-i18next only initialises it on the client, so guard the call: during
+  // prerender `i18n` is a placeholder without changeLanguage().
+  useEffect(() => {
+    if (
+      i18n &&
+      typeof i18n.changeLanguage === "function" &&
+      i18n.language !== initialLocale
+    ) {
+      void i18n.changeLanguage(initialLocale);
+    }
+  }, [i18n, initialLocale]);
 
   const isJobDetailPage = router.pathname === "/jobs/[id]";
 
@@ -59,10 +66,23 @@ function App({ Component, pageProps }: AppProps) {
     setShortcutsModalOpen((current) => !current);
   }, []);
 
+  const handleCloseCommandPalette = useCallback(() => setCommandPaletteOpen(false), []);
+
+  // Every callback below has to match UseKeyboardShortcutsOptions: the hook
+  // invokes each one from a key handler, so a name it does not declare is dead
+  // (this call used to pass `isJobDetailPage`, `onNewJobPost`, `onJobApply` and
+  // `onJobBackToListing`, none of which the hook accepts) while a required one
+  // that is missing throws as soon as that key is pressed — `p`, `/`, `b` and
+  // Cmd/Ctrl+K were unreachable for exactly that reason. `/` and `b` are
+  // forwarded as events because the jobs page already listens for them
+  // (pages/jobs/index.tsx).
   useKeyboardShortcuts({
     onGoToJobs: () => router.push("/jobs"),
     onGoToDashboard: () => router.push("/dashboard"),
     onPostJob: () => router.push("/post-job"),
+    onFocusSearch: () => window.dispatchEvent(new CustomEvent("shortcut-focus-search")),
+    onToggleBookmark: () => window.dispatchEvent(new CustomEvent("shortcut-toggle-bookmark")),
+    onOpenCommandPalette: () => setCommandPaletteOpen(true),
     onToggleShortcutsModal: handleToggleShortcutsModal,
     onFocusSearch: () => window.dispatchEvent(new CustomEvent("shortcut-focus-search")),
     onToggleBookmark: () => window.dispatchEvent(new CustomEvent("shortcut-toggle-bookmark")),
@@ -121,65 +141,36 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <ThemeProvider>
-        <ToastProvider>
-          <PriceProvider>
-            <Head>
-              <title>
-                Stellar MarketPay — Decentralised Freelance Marketplace
-              </title>
-              <meta
-                name="description"
-                content="Post jobs, hire freelancers, and pay with XLM — secured by Soroban smart contracts."
-              />
-              <meta
-                name="viewport"
-                content="width=device-width, initial-scale=1"
-              />
-              <link rel="manifest" href="/manifest.json" />
-              <link rel="apple-touch-icon" href="/icon-192x192.png" />
-              <link
-                rel="alternate"
-                type="application/rss+xml"
-                title="Stellar MarketPay — Job Listings (RSS)"
-                href="/api/jobs/feed.rss"
-              />
-              <link
-                rel="alternate"
-                type="application/atom+xml"
-                title="Stellar MarketPay — Job Listings (Atom)"
-                href="/api/jobs/feed.atom"
-              />
-            </Head>
-            <OfflineBanner />
-            <div className="min-h-screen bg-ink-900 bg-lines">
-              <Navbar
-                publicKey={publicKey}
-                onConnect={handleConnect}
-                onDisconnect={() => setPublicKey(null)}
-              />
-              <main>
-                <Component
-                  {...pageProps}
-                  publicKey={publicKey}
-                  onConnect={handleConnect}
-                />
-              </main>
-              <KeyboardShortcutsModal
-                isOpen={shortcutsModalOpen}
-                onClose={() => setShortcutsModalOpen(false)}
-                showJobDetailShortcuts={isJobDetailPage}
-              />
-              <CommandPalette
-                isOpen={commandPaletteOpen}
-                onClose={() => setCommandPaletteOpen(false)}
-              />
-            </div>
-            <RateLimitWatcher />
-          </PriceProvider>
-        </ToastProvider>
+      <ToastProvider>
+        <PriceProvider>
+        <Head>
+          <title>Stellar MarketPay — Decentralised Freelance Marketplace</title>
+          <meta name="description" content="Post jobs, hire freelancers, and pay with XLM — secured by Soroban smart contracts." />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <link rel="manifest" href="/manifest.json" />
+          <link rel="apple-touch-icon" href="/icon-192x192.png" />
+          <link rel="alternate" type="application/rss+xml" title="Stellar MarketPay — Job Listings (RSS)" href="/api/jobs/feed.rss" />
+          <link rel="alternate" type="application/atom+xml" title="Stellar MarketPay — Job Listings (Atom)" href="/api/jobs/feed.atom" />
+        </Head>
+        <OfflineBanner />
+        <div className="min-h-screen bg-ink-900 bg-lines">
+          <Navbar publicKey={publicKey} onConnect={handleConnect} onDisconnect={() => setPublicKey(null)} />
+          <main>
+            <Component {...pageProps} publicKey={publicKey} onConnect={handleConnect} />
+          </main>
+          <KeyboardShortcutsModal
+            isOpen={shortcutsModalOpen}
+            onClose={() => setShortcutsModalOpen(false)}
+            showJobDetailShortcuts={isJobDetailPage}
+          />
+          <CommandPalette isOpen={commandPaletteOpen} onClose={handleCloseCommandPalette} />
+        </div>
+        <RateLimitWatcher />
+        </PriceProvider>
+      </ToastProvider>
       </ThemeProvider>
     </>
   );
 }
 
-export default App;
+export default appWithTranslation(App, nextI18NextConfig);
