@@ -1,3 +1,4 @@
+import SubmitDeliverableHash from "@/components/SubmitDeliverableHash";
 import TimeTracker from "@/components/TimeTracker";
 import FeeEstimationModal from "@/components/FeeEstimationModal";
 import ConfirmDialog from "@/components/ConfirmDialog";
@@ -724,6 +725,10 @@ export default function JobDetail({ publicKey, onConnect, ssrJob, ogBaseUrl }: J
           <TimeTracker jobId={job.id} isFreelancer={isFreelancer} isClient={isClient} />
         )}
 
+        {isFreelancer && job.status === "in_progress" && publicKey && (
+          <SubmitDeliverableHash jobId={job.id} freelancerAddress={publicKey} />
+        )}
+
         {/* ── Applications list (client only, real-time via RealtimeBidComparison) ── */}
         {isClient && (
           <div className="mb-6">
@@ -751,11 +756,9 @@ export default function JobDetail({ publicKey, onConnect, ssrJob, ogBaseUrl }: J
         {/* ── Apply section (non-client, open jobs) ── */}
         {job.status === "open" && !isClient && (
           <>
-            {hasApplied ? (
+            {hasApplied && !showApplyForm ? (
               <div className="card text-center py-8 border-market-500/20 mb-6">
-                <div className="flex items-center justify-center gap-2 mb-1">
-                  <p className="text-market-400 font-medium">Application submitted</p>
-                </div>
+                <p className="text-market-400 font-medium mb-1">Application submitted</p>
                 <p className="text-amber-800 text-sm">
                   The client will review your proposal shortly.
                 </p>
@@ -766,7 +769,6 @@ export default function JobDetail({ publicKey, onConnect, ssrJob, ogBaseUrl }: J
                 publicKey={publicKey}
                 prefillData={prefillData}
                 onSuccess={() => {
-                  setShowApplyForm(false);
                   fetchApplicationsPage(job.id).then((page) => {
                     setApplications(page.applications);
                     setApplicationsCursor(page.nextCursor);
