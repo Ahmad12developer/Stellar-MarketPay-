@@ -42,4 +42,5 @@ export * from "./priceAlerts";
 export * from "./aiScorer";
 export * from "./autoConvert";
 export * from "./reputation";
+export * from "./talentPool";
 export * from "./search";
