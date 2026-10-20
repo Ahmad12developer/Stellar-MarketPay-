@@ -2,75 +2,105 @@
 
 exports[`static component snapshots Admin2FAModal setup mode: Admin2FAModal setup 1`] = `
 <div
-  class="fixed inset-0 z-[80] flex items-center justify-center p-4"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 z-[80] bg-ink-950/60"
 >
   <div
-    class="absolute inset-0 bg-ink-950/90 backdrop-blur-sm"
+    aria-hidden="true"
+    class="absolute inset-0 bg-black/60 backdrop-blur-sm"
   />
   <div
+    aria-describedby="modal-description"
+    aria-labelledby="admin-2fa-title"
+    aria-modal="true"
     class="relative w-full max-w-md rounded-2xl border border-market-500/20 bg-ink-900 p-6 shadow-2xl"
+    role="dialog"
+    tabindex="-1"
   >
-    <h2
-      class="font-display text-xl font-bold text-amber-100 mb-2"
-    >
-      Set up two-factor authentication
-    </h2>
     <p
-      class="text-sm text-amber-800 mb-4"
+      class="sr-only"
+      id="modal-description"
     >
-      Scan the QR code with Google Authenticator (or similar), then enter the 6-digit code.
+      Set up two-factor authentication for your admin account.
     </p>
-    <button
-      class="btn-primary w-full mb-4"
-      type="button"
-    >
-      Generate QR code
-    </button>
+    <div>
+      <h2
+        class="font-display text-xl font-bold text-amber-100 mb-2"
+        id="admin-2fa-title"
+      >
+        Set up two-factor authentication
+      </h2>
+      <p
+        class="text-sm text-amber-800 mb-4"
+      >
+        Scan the QR code with Google Authenticator (or similar), then enter the 6-digit code.
+      </p>
+      <button
+        class="btn-primary w-full mb-4"
+        type="button"
+      >
+        Generate QR code
+      </button>
+    </div>
   </div>
 </div>
 `;
 
 exports[`static component snapshots Admin2FAModal verify mode: Admin2FAModal verify 1`] = `
 <div
-  class="fixed inset-0 z-[80] flex items-center justify-center p-4"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 z-[80] bg-ink-950/60"
 >
   <div
-    class="absolute inset-0 bg-ink-950/90 backdrop-blur-sm"
+    aria-hidden="true"
+    class="absolute inset-0 bg-black/60 backdrop-blur-sm"
   />
   <div
+    aria-describedby="modal-description"
+    aria-labelledby="admin-2fa-title"
+    aria-modal="true"
     class="relative w-full max-w-md rounded-2xl border border-market-500/20 bg-ink-900 p-6 shadow-2xl"
+    role="dialog"
+    tabindex="-1"
   >
-    <h2
-      class="font-display text-xl font-bold text-amber-100 mb-2"
-    >
-      Admin 2FA required
-    </h2>
     <p
-      class="text-sm text-amber-800 mb-4"
+      class="sr-only"
+      id="modal-description"
     >
-      Enter the 6-digit code from your authenticator app to continue.
+      Enter your authenticator code to continue as admin.
     </p>
-    <form
-      class="space-y-4"
-    >
-      <input
-        class="input w-full text-center text-lg tracking-widest font-mono"
-        inputmode="numeric"
-        maxlength="6"
-        pattern="[0-9]{6}"
-        placeholder="000000"
-        required=""
-        type="text"
-        value=""
-      />
-      <button
-        class="btn-primary w-full"
-        disabled=""
-        type="submit"
+    <div>
+      <h2
+        class="font-display text-xl font-bold text-amber-100 mb-2"
+        id="admin-2fa-title"
       >
-        Verify
-      </button>
-    </form>
+        Admin 2FA required
+      </h2>
+      <p
+        class="text-sm text-amber-800 mb-4"
+      >
+        Enter the 6-digit code from your authenticator app to continue.
+      </p>
+      <form
+        class="space-y-4"
+      >
+        <input
+          class="input w-full text-center text-lg tracking-widest font-mono"
+          inputmode="numeric"
+          maxlength="6"
+          pattern="[0-9]{6}"
+          placeholder="000000"
+          required=""
+          type="text"
+          value=""
+        />
+        <button
+          class="btn-primary w-full"
+          disabled=""
+          type="submit"
+        >
+          Verify
+        </button>
+      </form>
+    </div>
   </div>
 </div>
 `;
@@ -271,6 +301,7 @@ exports[`static component snapshots BoostJobModal default: BoostJobModal 1`] = `
   <button
     aria-label="Close dialog"
     class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+    tabindex="-1"
     type="button"
   />
   <div
@@ -477,6 +508,7 @@ exports[`static component snapshots FeeEstimationModal loading: FeeEstimationMod
   <button
     aria-label="Close dialog"
     class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+    tabindex="-1"
     type="button"
   />
   <div
@@ -924,7 +956,7 @@ exports[`static component snapshots JobCard bookmarked: JobCard bookmarked 1`] =
       </p>
     </div>
     <div
-      class="text-right flex items-center gap-2"
+      class="text-end flex items-center gap-2"
     >
       <button
         aria-label="Remove bookmark"
@@ -953,7 +985,7 @@ exports[`static component snapshots JobCard bookmarked: JobCard bookmarked 1`] =
         </svg>
       </button>
       <div
-        class="text-right"
+        class="text-end"
       >
         <p
           class="text-xs text-amber-800 mb-0.5"
@@ -1063,7 +1095,7 @@ exports[`static component snapshots JobCard default: JobCard default 1`] = `
       </p>
     </div>
     <div
-      class="text-right flex items-center gap-2"
+      class="text-end flex items-center gap-2"
     >
       <button
         aria-label="Save job"
@@ -1092,7 +1124,7 @@ exports[`static component snapshots JobCard default: JobCard default 1`] = `
         </svg>
       </button>
       <div
-        class="text-right"
+        class="text-end"
       >
         <p
           class="text-xs text-amber-800 mb-0.5"
@@ -1542,6 +1574,7 @@ exports[`static component snapshots KeyboardShortcutsModal open: KeyboardShortcu
   <button
     aria-label="Close dialog"
     class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+    tabindex="-1"
     type="button"
   />
   <div
@@ -3089,165 +3122,181 @@ exports[`static component snapshots SendPaymentForm default: SendPaymentForm 1`]
 
 exports[`static component snapshots ShareJobModal default: ShareJobModal 1`] = `
 <div
-  class="fixed inset-0 z-50 bg-ink-900/90 backdrop-blur-sm flex items-center justify-center p-4"
-  role="presentation"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4"
 >
+  <button
+    aria-label="Close dialog"
+    class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+    tabindex="-1"
+    type="button"
+  />
   <div
-    aria-label="Share job: Build a Soroban escrow contract for marketplace payouts"
+    aria-describedby="modal-description"
+    aria-labelledby="share-job-title"
     aria-modal="true"
-    class="w-full max-w-md bg-ink-800 rounded-xl border border-market-500/20 shadow-xl"
+    class="relative w-full max-w-md bg-ink-800 rounded-xl border border-market-500/20 shadow-xl"
     role="dialog"
+    tabindex="-1"
   >
-    <div
-      class="flex items-center justify-between p-6 border-b border-market-500/10"
+    <p
+      class="sr-only"
+      id="modal-description"
     >
-      <h3
-        class="font-display text-lg font-semibold text-amber-100"
+      Share the job "Build a Soroban escrow contract for marketplace payouts" with a link or QR code.
+    </p>
+    <div>
+      <div
+        class="flex items-center justify-between p-6 border-b border-market-500/10"
       >
-        Share Job
-      </h3>
-      <button
-        aria-label="Close share job modal"
-        class="text-amber-800 hover:text-amber-600 transition-colors"
-        type="button"
-      >
-        <svg
-          class="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+        <h3
+          class="font-display text-lg font-semibold text-amber-100"
+          id="share-job-title"
         >
-          <path
-            d="M6 18L18 6M6 6l12 12"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-          />
-        </svg>
-      </button>
-    </div>
-    <div
-      class="p-6 space-y-6"
-    >
-      <div>
-        <h4
-          class="font-display text-amber-100 font-medium mb-2"
+          Share Job
+        </h3>
+        <button
+          aria-label="Close share job modal"
+          class="text-amber-800 hover:text-amber-600 transition-colors"
+          type="button"
         >
-          Build a Soroban escrow contract for marketplace payouts
-        </h4>
-        <p
-          class="text-amber-800 text-sm"
-        >
-          Smart Contracts
-           • 
-          XLM
-           
-          500.0000000
-        </p>
-        <p
-          class="text-amber-800/80 text-xs mt-2 leading-relaxed"
-        >
-          <span
-            aria-hidden="true"
-            class="mr-1"
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            🪪
-          </span>
-          Shared on Discord, X, LinkedIn, Slack, or iMessage this link renders a rich preview card with the job title, budget, and category — generated automatically by
-           
-          <code
-            class="font-mono text-[11px] text-amber-700"
-          >
-            /api/og/[jobId]
-          </code>
-          .
-        </p>
+            <path
+              d="M6 18L18 6M6 6l12 12"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+            />
+          </svg>
+        </button>
       </div>
       <div
-        class="space-y-4"
+        class="p-6 space-y-6"
       >
         <div>
-          <label
-            class="block text-sm font-medium text-amber-200 mb-2"
-            for="share-job-url"
+          <h4
+            class="font-display text-amber-100 font-medium mb-2"
           >
-            Share Job URL
-          </label>
-          <div
-            class="flex gap-2"
+            Build a Soroban escrow contract for marketplace payouts
+          </h4>
+          <p
+            class="text-amber-800 text-sm"
           >
-            <input
-              class="flex-1 px-3 py-2 bg-ink-900 border border-market-500/20 rounded-lg text-amber-100 text-sm"
-              id="share-job-url"
-              readonly=""
-              type="text"
-              value="http://localhost/jobs/job-1"
-            />
-            <button
-              class="btn-secondary px-4 py-2 text-sm"
+            Smart Contracts
+             • 
+            XLM
+             
+            500.0000000
+          </p>
+          <p
+            class="text-amber-800/80 text-xs mt-2 leading-relaxed"
+          >
+            <span
+              aria-hidden="true"
+              class="mr-1"
             >
-              Copy
-            </button>
-          </div>
+              🪪
+            </span>
+            Shared on Discord, X, LinkedIn, Slack, or iMessage this link renders a rich preview card with the job title, budget, and category — generated automatically by
+             
+            <code
+              class="font-mono text-[11px] text-amber-700"
+            >
+              /api/og/[jobId]
+            </code>
+            .
+          </p>
         </div>
-        <div>
-          <span
-            class="block text-sm font-medium text-amber-200 mb-2"
-          >
-            Create Invite Link (Pre-filled Application)
-          </span>
-          <div
-            class="space-y-3 mb-4"
-          >
-            <div>
-              <label
-                class="block text-xs text-amber-800 mb-1"
-              >
-                Suggested Bid Amount (
-                XLM
-                )
-              </label>
+        <div
+          class="space-y-4"
+        >
+          <div>
+            <label
+              class="block text-sm font-medium text-amber-200 mb-2"
+              for="share-job-url"
+            >
+              Share Job URL
+            </label>
+            <div
+              class="flex gap-2"
+            >
               <input
-                class="w-full px-3 py-2 bg-ink-900 border border-market-500/20 rounded-lg text-amber-100 text-sm"
-                placeholder="e.g. 500"
+                class="flex-1 px-3 py-2 bg-ink-900 border border-market-500/20 rounded-lg text-amber-100 text-sm"
+                id="share-job-url"
+                readonly=""
                 type="text"
-                value=""
+                value="http://localhost/jobs/job-1"
               />
-            </div>
-            <div>
-              <label
-                class="block text-xs text-amber-800 mb-1"
-                for="personal-message-optional"
+              <button
+                class="btn-secondary px-4 py-2 text-sm"
               >
-                Personal Message (optional)
-              </label>
-              <textarea
-                class="w-full px-3 py-2 bg-ink-900 border border-market-500/20 rounded-lg text-amber-100 text-sm resize-none"
-                id="personal-message-optional"
-                placeholder="Add a personal note for the freelancer..."
-                rows="3"
-              />
+                Copy
+              </button>
             </div>
           </div>
-          <div
-            class="flex gap-2"
-          >
-            <input
-              class="flex-1 px-3 py-2 bg-ink-900 border border-market-500/20 rounded-lg text-amber-100 text-xs"
-              readonly=""
-              type="text"
-              value="http://localhost/jobs/job-1?prefill=eyJqb2JJZCI6ImpvYi0xIn0%3D"
-            />
-            <button
-              class="btn-secondary px-4 py-2 text-sm"
+          <div>
+            <span
+              class="block text-sm font-medium text-amber-200 mb-2"
             >
-              Copy
-            </button>
-            <button
-              class="btn-secondary px-4 py-2 text-sm"
+              Create Invite Link (Pre-filled Application)
+            </span>
+            <div
+              class="space-y-3 mb-4"
             >
-              QR
-            </button>
+              <div>
+                <label
+                  class="block text-xs text-amber-800 mb-1"
+                >
+                  Suggested Bid Amount (
+                  XLM
+                  )
+                </label>
+                <input
+                  class="w-full px-3 py-2 bg-ink-900 border border-market-500/20 rounded-lg text-amber-100 text-sm"
+                  placeholder="e.g. 500"
+                  type="text"
+                  value=""
+                />
+              </div>
+              <div>
+                <label
+                  class="block text-xs text-amber-800 mb-1"
+                  for="personal-message-optional"
+                >
+                  Personal Message (optional)
+                </label>
+                <textarea
+                  class="w-full px-3 py-2 bg-ink-900 border border-market-500/20 rounded-lg text-amber-100 text-sm resize-none"
+                  id="personal-message-optional"
+                  placeholder="Add a personal note for the freelancer..."
+                  rows="3"
+                />
+              </div>
+            </div>
+            <div
+              class="flex gap-2"
+            >
+              <input
+                class="flex-1 px-3 py-2 bg-ink-900 border border-market-500/20 rounded-lg text-amber-100 text-xs"
+                readonly=""
+                type="text"
+                value="http://localhost/jobs/job-1?prefill=eyJqb2JJZCI6ImpvYi0xIn0%3D"
+              />
+              <button
+                class="btn-secondary px-4 py-2 text-sm"
+              >
+                Copy
+              </button>
+              <button
+                class="btn-secondary px-4 py-2 text-sm"
+              >
+                QR
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -3562,6 +3611,7 @@ exports[`static component snapshots WelcomeModal open: WelcomeModal open 1`] = `
   <button
     aria-label="Close dialog"
     class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+    tabindex="-1"
     type="button"
   />
   <div
